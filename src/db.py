@@ -6,7 +6,10 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
-engine = create_async_engine(DATABASE_URL, echo=True, future=True, pool_pre_ping=True)
+engine = create_async_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
+async_session = async_sessionmaker(
+    engine, class_=AsyncSession, autocommit=False, autoflush=False
+)
 
 
 async def init_db():
@@ -15,8 +18,5 @@ async def init_db():
 
 
 async def get_session():
-    async_session = async_sessionmaker(
-        engine, class_=AsyncSession, autocommit=False, autoflush=False
-    )
     async with async_session() as session:
         yield session

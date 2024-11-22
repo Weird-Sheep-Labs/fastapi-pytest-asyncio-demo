@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from db import get_session
@@ -16,12 +15,11 @@ from main import app
 async_engine = create_async_engine(
     url=os.environ["DATABASE_URL"],
     echo=False,
-    poolclass=NullPool,
 )
 
 
 # Drop all tables after each test
-@pytest_asyncio.fixture(scope="function")
+@pytest_asyncio.fixture(scope="class")
 async def async_db_engine():
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
@@ -32,7 +30,7 @@ async def async_db_engine():
         await conn.run_sync(SQLModel.metadata.drop_all)
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest_asyncio.fixture(scope="class")
 async def async_db(async_db_engine):
     async_session = async_sessionmaker(
         expire_on_commit=False,
@@ -50,7 +48,7 @@ async def async_db(async_db_engine):
         await session.rollback()
 
 
-@pytest_asyncio.fixture(scope="function", autouse=True)
+@pytest_asyncio.fixture(scope="class", autouse=True)
 async def async_client(async_db):
     def override_get_db():
         yield async_db

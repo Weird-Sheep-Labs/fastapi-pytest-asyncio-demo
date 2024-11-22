@@ -34,7 +34,7 @@ filterwarnings = [
    # boto3 throw this warning, nothing we can do about it
    'ignore:datetime.datetime.utcnow\(\) is deprecated',
 ]
-asyncio_default_fixture_loop_scope = "function"
+asyncio_default_fixture_loop_scope = 'class'
 
 [tool.ruff]
 extend-exclude = ["migrations/versions"]
